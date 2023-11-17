@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wordle Game</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      background-color: #f3f3f3;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+    #wordle-container {
+      background-color: #fff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #007bff;
+    }
+    #word-input {
+      width: 150px;
+      margin-right: 10px;
+      text-transform: uppercase;
+      padding: 8px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    #submit-btn, #play-again-btn, #hint-btn {
+      cursor: pointer;
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+    }
+    #feedback {
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      letter-spacing: 5px;
+    }
+    #guessed-letters {
+      margin-top: 10px;
+      font-size: 18px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+<div id="wordle-container">
+  <h1>Wordle Game</h1>
+  <p>Guess the secret word!</p>
+  <div>
+    <input type="text" id="word-input" maxlength="5" placeholder="Enter a 5-letter word">
+    <button id="submit-btn" onclick="checkGuess()">Submit Guess</button>
+    <button id="hint-btn" onclick="getHint()">Hint</button>
+  </div>
+  <p id="feedback"></p>
+  <div id="guessed-letters"></div>
+  <button id="play-again-btn" onclick="playAgain()">Play Again</button>
+</div>
+
+<script>
+  const wordList = ["apple", "beach", "cloud", "dream", "earth", "flame", "grape", "happy", "image", "jumbo", "kiosk", "lucky", "magic", "never", "ocean", "piano", "queen", "rider", "smile", "table", "ultra", "vivid", "waltz", "xylophone", "youth", "zebra", "blink", "crane", "daisy", "enjoy", "frost", "glint", "happy", "ivory", "jelly", "kitty", "lemon", "mango", "night", "opera", "pouch", "quart", "rover", "sunny", "tiger", "umbra", "vowel", "wedge", "xerox", "yacht", "zeal"];
+
+  let secretWord;
+  let guessedLetters = [];
+  let attempts = 0;
+  const maxAttempts = 10;
+
+  function initializeGame() {
+    secretWord = wordList[Math.floor(Math.random() * wordList.length)];
+    guessedLetters = [];
+    attempts = 0;
+    document.getElementById("word-input").value = "";
+    document.getElementById("feedback").innerHTML = "";
+    document.getElementById("guessed-letters").innerHTML = "";
+  }
+
+  function checkGuess() {
+    const inputElement = document.getElementById("word-input");
+    const guess = inputElement.value.toUpperCase();
+
+    if (!isValidGuess(guess)) {
+      alert("Please enter a valid 5-letter word!");
+      return;
+    }
+
+    if (guessedLetters.includes(guess)) {
+      alert("You already guessed this word. Try a different one!");
+      return;
+    }
+
+    if (guess === secretWord) {
+      displayWinMessage();
+    } else {
+      const correctLetters = getCorrectLetters(guess);
+      displayFeedback(correctLetters);
+      updateGuessedLetters(guess);
+      attempts++;
+
+      if (attempts >= maxAttempts) {
+        displayLoseMessage();
+      }
+    }
+  }
+
+  function isValidGuess(guess) {
+    return /^[A-Z]{5}$/.test(guess);
+  }
+
+  function getCorrectLetters(guess) {
+    const correctLetters = [];
+    for (let i = 0; i < guess.length; i++) {
+      if (secretWord.includes(guess[i])) {
+        correctLetters.push(guess[i]);
+      }
+    }
+    return correctLetters;
+  }
+
+  function displayFeedback(correctLetters) {
+    let feedback = "";
+    for (let i = 0; i < secretWord.length; i++) {
+      if (correctLetters.includes(secretWord[i])) {
+        feedback += secretWord[i];
+      } else {
+        feedback += "_";
+      }
+    }
+    document.getElementById("feedback").innerHTML = feedback;
+  }
+
+  function displayWinMessage() {
+    document.getElementById("feedback").innerHTML = "Congratulations! You guessed the word!";
+  }
+
+  function displayLoseMessage() {
+    document.getElementById("feedback").innerHTML = `Sorry, you ran out of attempts. The correct word was ${secretWord}.`;
+  }
+
+  function updateGuessedLetters(guess) {
+    guessedLetters.push(guess);
+    document.getElementById("guessed-letters").innerHTML = `Guessed Letters:<br>${guessedLetters.join('<br>')}`;
+  }
+
+  function playAgain() {
+    initializeGame();
+    document.getElementById("feedback").innerHTML = "Game reset. Guess the new word!";
+  }
+
+  function getHint() {
+    if (secretWord.length > 0) {
+      const hintLetter = secretWord[Math.floor(Math.random() * secretWord.length)];
+      alert(`Hint: The secret word contains the letter "${hintLetter}"`);
+    }
+  }
+
+  window.onload = initializeGame;
+</script>
+
+</body>
+</html>
